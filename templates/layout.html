@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EFRC1TTH3B"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-EFRC1TTH3B');
+    </script>
+
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Dynamic title based on page -->
+    {% if title %}
+    <title>{{ title }} | Mooviestream | Online movie streaming platform. Watch popular movies.</title>
+    {% else %}
+    <title>Mooviestream | Family movie streaming platform. Watch recent popular movies.</title>
+    {% endif %}
+    
+    <!-- Meta tags for SEO -->
+    {% if movie is defined %}
+    <meta name="description" content="{{ movie.overview[:160] }}...">
+    {% elif show is defined %}
+    <meta name="description" content="{{ show.overview[:160] }}...">
+    {% elif actor is defined %}
+    <meta name="description" content="Explore {{ actor.name }}'s filmography and biography on Mooviestream. Watch their movies and TV shows online.">
+    {% else %}
+    <meta name="description" content="Mooviestream is a family-friendly online streaming platform offering a wide selection of movies and TV shows. Watch the latest releases and classics online.">
+    {% endif %}
+    
+    <!-- Keywords meta tag -->
+    <meta name="keywords" content="movies, tv shows, streaming, online movie, online film, online tv, watch online, family movies, entertainment, film, television">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ request.url }}">
+    
+    <!-- PWA manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#1962BE">
+    
+    <!-- Apple specific meta tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mooviestream">
+    <!-- Apple touch icons for iOS - must be PNG format, multiple sizes for different devices -->
+    <!-- Using dedicated route with no-cache headers to prevent iOS caching issues -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('apple_touch_icon', size=180, _external=True) }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('apple_touch_icon', size=152, _external=True) }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('apple_touch_icon', size=120, _external=True) }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('apple_touch_icon', size=76, _external=True) }}">
+    <!-- Default apple-touch-icon (fallback - must be last) -->
+    <link rel="apple-touch-icon" href="{{ url_for('apple_touch_icon', size=180, _external=True) }}">
+
+
+    <!-- Microsoft Tile -->
+    <meta name="msapplication-TileColor" content="#1962BE">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='images/logo-icon.svg') }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    {% if movie is defined %}
+    <meta property="og:title" content="{{ movie.title }} | Mooviestream">
+    <meta property="og:description" content="{{ movie.overview[:160] }}...">
+    {% if movie.backdrop_url %}
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% else %}
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% endif %}
+    {% elif show is defined %}
+    <meta property="og:title" content="{{ show.name }} | Mooviestream">
+    <meta property="og:description" content="{{ show.overview[:160] }}...">
+    {% if show.backdrop_url %}
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% else %}
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% endif %}
+    {% else %}
+    <meta property="og:title" content="{% if title %}{{ title }} | {% endif %}Mooviestream">
+    <meta property="og:description" content="Mooviestream is a family-friendly streaming platform offering a wide selection of movies and TV shows. Watch the latest releases and classics online.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% endif %}
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    {% if movie is defined %}
+    <meta property="twitter:title" content="{{ movie.title }} | Mooviestream">
+    <meta property="twitter:description" content="{{ movie.overview[:160] }}...">
+    {% if movie.backdrop_url %}
+    <meta property="twitter:image" content="{{ movie.backdrop_url }}">
+    {% else %}
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% endif %}
+    {% elif show is defined %}
+    <meta property="twitter:title" content="{{ show.name }} | Mooviestream">
+    <meta property="twitter:description" content="{{ show.overview[:160] }}...">
+    {% if show.backdrop_url %}
+    <meta property="twitter:image" content="{{ show.backdrop_url }}">
+    {% else %}
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% endif %}
+    {% else %}
+    <meta property="twitter:title" content="{% if title %}{{ title }} | {% endif %}Mooviestream">
+    <meta property="twitter:description" content="Mooviestream is a family-friendly streaming platform offering a wide selection of movies and TV shows. Watch the latest releases and classics online.">
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/logo-180.png', _external=True) }}?v=2">
+    {% endif %}
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Smart TV layout (WebOS, Tizen, Android TV): 10ft UI, focus states, safe area -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tv.css') }}" media="(min-width: 1920px) and (min-height: 1080px)">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/logo-icon.svg">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    
+    <!-- Structured Data / JSON-LD -->
+    {% if movie is defined %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Movie",
+      "name": "{{ movie.title }}",
+      "description": "{{ movie.overview }}",
+      {% if movie.poster_url %}
+      "image": "{{ movie.poster_url }}",
+      {% endif %}
+      "datePublished": "{{ movie.release_date }}",
+      "director": {% if movie.credits and movie.credits.crew %}
+        [{% for crew in movie.credits.crew if crew.job == 'Director' %}
+          {
+            "@type": "Person",
+            "name": "{{ crew.name }}"
+          }{% if not loop.last %},{% endif %}
+        {% endfor %}]
+      {% else %}
+        null
+      {% endif %},
+      "actor": {% if movie.credits and movie.credits.cast %}
+        [{% for actor in movie.credits.cast[:5] %}
+          {
+            "@type": "Person",
+            "name": "{{ actor.name }}"
+          }{% if not loop.last %},{% endif %}
+        {% endfor %}]
+      {% else %}
+        null
+      {% endif %},
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ movie.vote_average }}",
+        "bestRating": "10",
+        "worstRating": "0",
+        "ratingCount": "{{ movie.vote_count }}"
+      },
+      "duration": "PT{{ movie.runtime }}M",
+      "genre": [{% for genre in movie.genres %}"{{ genre.name }}"{% if not loop.last %},{% endif %}{% endfor %}]
+    }
+    </script>
+    {% elif show is defined %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TVSeries",
+      "name": "{{ show.name }}",
+      "description": "{{ show.overview }}",
+      {% if show.poster_url %}
+      "image": "{{ show.poster_url }}",
+      {% endif %}
+      "datePublished": "{{ show.first_air_date }}",
+      "actor": {% if show.credits and show.credits.cast %}
+        [{% for actor in show.credits.cast[:5] %}
+          {
+            "@type": "Person",
+            "name": "{{ actor.name }}"
+          }{% if not loop.last %},{% endif %}
+        {% endfor %}]
+      {% else %}
+        null
+      {% endif %},
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ show.vote_average }}",
+        "bestRating": "10",
+        "worstRating": "0",
+        "ratingCount": "{{ show.vote_count }}"
+      },
+      "numberOfSeasons": "{{ show.number_of_seasons }}",
+      "numberOfEpisodes": "{{ show.number_of_episodes }}",
+      "genre": [{% for genre in show.genres %}"{{ genre.name }}"{% if not loop.last %},{% endif %}{% endfor %}]
+    }
+    </script>
+    {% elif actor is defined %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "{{ actor.name }}",
+      "description": "{{ actor.biography }}",
+      {% if actor.profile_url %}
+      "image": "{{ actor.profile_url }}",
+      {% endif %}
+      "birthDate": "{{ actor.birthday }}",
+      {% if actor.deathday %}
+      "deathDate": "{{ actor.deathday }}",
+      {% endif %}
+      "birthPlace": "{{ actor.place_of_birth }}"
+    }
+    </script>
+    {% else %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Mooviestream",
+      "url": "{{ request.url_root }}",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ request.url_root }}search?query={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "description": "Mooviestream is a family-friendly streaming platform offering a wide selection of movies and TV shows. Watch the latest releases and classics online."
+    }
+    </script>
+    {% endif %}
+
+    <style>
+        .iframe-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            gap: 0;
+        }
+        .banner-wrapper {
+            position: relative;
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-width: 300px;
+            box-sizing: border-box;
+        }
+        .banner-wrapper iframe {
+            width: 300px;
+            height: 250px;
+            max-width: 100%;
+            border: none;
+            display: block;
+        }
+        .banner-close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(25, 98, 190, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .banner-close-btn:hover {
+            background: rgba(25, 98, 190, 1);
+            color: #fff;
+        }
+        @media (max-width: 900px) {
+            .banner-wrapper {
+                width: 100%;
+                min-width: 0;
+            }
+            .iframe-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <h1><a href="{{ url_for('index') }}" class="logo-link"><img src="/static/images/logo-icon.svg" alt="Mooviestream" width="60px" height="60px"><span class="logo-text">Mooviestream</span></a></h1>
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <form class="search-form" action="{{ url_for('search') }}" method="get">
+                    <input type="text" name="query" placeholder="Search" required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <nav>
+                <ul class="main-nav">
+                    <li class="nav-group-label">Movies</li>
+                    <li><a href="{{ url_for('popular_movies') }}">Popular</a></li>
+                    <li><a href="{{ url_for('recent_movies') }}">Recent</a></li>
+                    <li><a href="{{ url_for('top_rated_movies') }}">Top Rated</a></li>
+                    <li class="nav-group-label">TV Shows</li>
+                    <li><a href="{{ url_for('popular_tv_shows') }}">Popular</a></li>
+                    <li><a href="{{ url_for('recent_tv_shows') }}">Recent</a></li>
+                    <li><a href="{{ url_for('top_rated_tv_shows') }}">Top Rated</a></li>
+                    <li class="dropdown nav-hidden">
+                        <a href="#" class="dropdown-toggle">Movie Genres <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <!-- This will be populated with JavaScript -->
+                        </ul>
+                    </li>
+                    <li class="dropdown nav-hidden">
+                        <a href="#" class="dropdown-toggle">TV Genres <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <!-- This will be populated with JavaScript -->
+                        </ul>
+                    </li>
+                    <!-- <li><a href="{{ url_for('contact') }}">Contact</a></li> -->
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" class="container">
+        {% block content %}
+        <!-- Content will be inserted here by child templates -->
+        {% endblock %}
+    </main>
+
+    <!-- JavaScript -->
+    <!-- Video.js JavaScript -->
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <!-- Smart TV / remote navigation (d-pad + Enter, spatial focus) -->
+    <script src="{{ url_for('static', filename='js/tv-nav.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Stub for tv-nav.js Escape key (app download popup removed)
+        function closeToast() {}
+        
+        // Fetch genres and populate the dropdown menus
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Fetch movie genres
+                const movieResponse = await fetch('/api/genres');
+                const movieGenres = await movieResponse.json();
+                
+                const movieDropdownMenu = document.querySelectorAll('.dropdown-menu')[0];
+                
+                movieGenres.forEach(genre => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `/genre/${genre.id}`;
+                    a.textContent = genre.name;
+                    li.appendChild(a);
+                    movieDropdownMenu.appendChild(li);
+                });
+                
+                // Fetch TV show genres
+                const tvResponse = await fetch('/api/tv/genres');
+                const tvGenres = await tvResponse.json();
+                
+                const tvDropdownMenu = document.querySelectorAll('.dropdown-menu')[1];
+                
+                tvGenres.forEach(genre => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `/tv/genre/${genre.id}`;
+                    a.textContent = genre.name;
+                    li.appendChild(a);
+                    tvDropdownMenu.appendChild(li);
+                });
+                
+                // Enhance image alt text for better SEO
+                enhanceImageAltText();
+            } catch (error) {
+                console.error('Error fetching genres:', error);
+            }
+            
+            // Note: Dropdown toggle and mobile menu toggle functionality is handled in main.js
+        });
+        
+        // Function to enhance image alt text for better SEO
+        function enhanceImageAltText() {
+            // Get all images on the page
+            const images = document.querySelectorAll('img');
+            
+            images.forEach(img => {
+                // Skip if image already has a detailed alt text
+                if (img.alt && img.alt.length > 10) return;
+                
+                // Get parent element to determine context
+                const parent = img.parentElement;
+                
+                // If image is in a link, use the link text or title as context
+                if (parent.tagName === 'A') {
+                    const linkText = parent.textContent.trim();
+                    const linkTitle = parent.getAttribute('title');
+                    
+                    if (linkText && !img.alt) {
+                        img.alt = linkText;
+                    } else if (linkTitle && !img.alt) {
+                        img.alt = linkTitle;
+                    }
+                }
+                
+                // If image has a src with a filename, use it to improve alt text
+                if (img.src && (!img.alt || img.alt.length < 5)) {
+                    const srcParts = img.src.split('/');
+                    const filename = srcParts[srcParts.length - 1].split('.')[0];
+                    
+                    // Convert filename to readable text (e.g., movie_poster_123 -> Movie Poster)
+                    if (filename) {
+                        const readableText = filename
+                            .replace(/[_-]/g, ' ')
+                            .replace(/\d+/g, '')
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ')
+                            .trim();
+                        
+                        if (readableText && readableText.length > 3) {
+                            img.alt = img.alt ? `${img.alt} - ${readableText}` : readableText;
+                        }
+                    }
+                }
+                
+                // Add context based on nearby headings
+                const nearestHeading = findNearestHeading(img);
+                if (nearestHeading && (!img.alt || img.alt.length < 10)) {
+                    const headingText = nearestHeading.textContent.trim();
+                    img.alt = img.alt ? `${img.alt} - ${headingText}` : headingText;
+                }
+            });
+        }
+        
+        // Helper function to find the nearest heading to an element
+        function findNearestHeading(element) {
+            let current = element;
+            
+            // Look up the DOM tree
+            while (current.parentElement) {
+                current = current.parentElement;
+                
+                // Check for headings in siblings before this element
+                let sibling = current.firstElementChild;
+                while (sibling) {
+                    if (/^H[1-6]$/.test(sibling.tagName)) {
+                        return sibling;
+                    }
+                    sibling = sibling.nextElementSibling;
+                }
+            }
+            
+            // If no heading found, return null
+            return null;
+        }
+    </script>
+</body>
+</html>

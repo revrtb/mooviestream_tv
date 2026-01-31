@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="about-section">
+    <h2>About {{ config.APP_NAME }}</h2>
+    
+    <div class="about-content">
+        <p>Welcome to {{ config.APP_NAME }}, your ultimate destination for movie information, reviews, and news. We are passionate about cinema and dedicated to providing you with the most comprehensive and up-to-date information about movies from around the world.</p>
+        
+        <h3>Our Mission</h3>
+        <p>Our mission is to help movie enthusiasts discover great films, stay informed about the latest releases, and connect with a community of like-minded individuals who share a love for the art of filmmaking.</p>
+        
+        <h3>What We Offer</h3>
+        <ul>
+            <li><strong>Comprehensive Movie Database:</strong> Access information about thousands of movies, including cast, crew, plot summaries, and technical details.</li>
+            <li><strong>Expert Reviews:</strong> Read thoughtful and insightful reviews from our team of experienced film critics.</li>
+            <li><strong>User Ratings:</strong> See what other viewers think about movies and share your own opinions.</li>
+            <li><strong>Latest News:</strong> Stay updated with the latest happenings in the world of cinema, including upcoming releases, casting announcements, and industry trends.</li>
+            <li><strong>Recommendations:</strong> Discover new movies based on your preferences and viewing history.</li>
+        </ul>
+        
+        <h3>Our Team</h3>
+        <p>{{ config.APP_NAME }} is brought to you by a team of dedicated film enthusiasts, critics, and web developers who are committed to creating the best possible movie information platform. Our diverse backgrounds and perspectives ensure that we cover a wide range of genres, styles, and cinematic traditions.</p>
+        
+        <h3>Contact Us</h3>
+        <p>We value your feedback and suggestions. If you have any questions, comments, or concerns, please don't hesitate to <a href="{{ url_for('contact') }}">contact us</a>.</p>
+    </div>
+</section>
+{% endblock %}

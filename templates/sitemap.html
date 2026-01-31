@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+{% from "partials/breadcrumb.html" import breadcrumb %}
+
+{% block content %}
+    {{ breadcrumb([
+        {'text': 'Sitemap'}
+    ]) }}
+
+    <div class="sitemap-container">
+        <h1>Sitemap</h1>
+        <p class="sitemap-intro">Welcome to the Mooviestream sitemap. This page provides an overview of all the main sections and pages on our website to help you navigate and find what you're looking for.</p>
+        
+        <div class="sitemap-section">
+            <h2>Main Pages</h2>
+            <ul class="sitemap-list">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">About Us</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/terms">Terms of Service</a></li>
+            </ul>
+        </div>
+        
+        <div class="sitemap-section">
+            <h2>Movies</h2>
+            <ul class="sitemap-list">
+                <li><a href="{{ url_for('popular_movies') }}">Popular Movies</a></li>
+                <li><a href="{{ url_for('recent_movies') }}">Recent Movies</a></li>
+                <li><a href="{{ url_for('top_rated_movies') }}">Top Rated Movies</a></li>
+                <li><a href="{{ url_for('trending_movies') }}">Trending Movies</a></li>
+            </ul>
+        </div>
+        
+        <div class="sitemap-section">
+            <h2>TV Shows</h2>
+            <ul class="sitemap-list">
+                <li><a href="{{ url_for('popular_tv_shows') }}">Popular TV Shows</a></li>
+                <li><a href="{{ url_for('recent_tv_shows') }}">Recent TV Shows</a></li>
+                <li><a href="{{ url_for('top_rated_tv_shows') }}">Top Rated TV Shows</a></li>
+                <li><a href="{{ url_for('trending_tv_shows') }}">Trending TV Shows</a></li>
+            </ul>
+        </div>
+        
+        <div class="sitemap-section">
+            <h2>Movie Genres</h2>
+            <div id="movie-genres-list" class="sitemap-grid">
+                <!-- Will be populated with JavaScript -->
+                <div class="loading">Loading genres...</div>
+            </div>
+        </div>
+        
+        <div class="sitemap-section">
+            <h2>TV Show Genres</h2>
+            <div id="tv-genres-list" class="sitemap-grid">
+                <!-- Will be populated with JavaScript -->
+                <div class="loading">Loading genres...</div>
+            </div>
+        </div>
+        
+        <div class="sitemap-section">
+            <h2>Technical Resources</h2>
+            <ul class="sitemap-list">
+                <li><a href="/sitemap.xml">XML Sitemap</a> (for search engines)</li>
+                <li><a href="/robots.txt">Robots.txt</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <style>
+        .sitemap-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .sitemap-intro {
+            margin-bottom: 30px;
+            color: #ccc;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .sitemap-section {
+            margin-bottom: 40px;
+        }
+        
+        .sitemap-section h2 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            color: black;
+        }
+        
+        .sitemap-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sitemap-list li {
+            margin-bottom: 10px;
+        }
+        
+        .sitemap-list li a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-block;
+            padding: 5px 0;
+        }
+        
+        .sitemap-list li a:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        .sitemap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .sitemap-grid a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-block;
+            padding: 5px 0;
+        }
+        
+        .sitemap-grid a:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        .loading {
+            color: #999;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .sitemap-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Fetch movie genres
+                const movieResponse = await fetch('/api/genres');
+                const movieGenres = await movieResponse.json();
+                
+                const movieGenresList = document.getElementById('movie-genres-list');
+                movieGenresList.innerHTML = ''; // Clear loading message
+                
+                movieGenres.forEach(genre => {
+                    const link = document.createElement('a');
+                    link.href = `/genre/${genre.id}`;
+                    link.textContent = genre.name;
+                    movieGenresList.appendChild(link);
+                });
+                
+                // Fetch TV show genres
+                const tvResponse = await fetch('/api/tv/genres');
+                const tvGenres = await tvResponse.json();
+                
+                const tvGenresList = document.getElementById('tv-genres-list');
+                tvGenresList.innerHTML = ''; // Clear loading message
+                
+                tvGenres.forEach(genre => {
+                    const link = document.createElement('a');
+                    link.href = `/tv/genre/${genre.id}`;
+                    link.textContent = genre.name;
+                    tvGenresList.appendChild(link);
+                });
+            } catch (error) {
+                console.error('Error fetching genres:', error);
+                document.getElementById('movie-genres-list').innerHTML = '<p class="error">Failed to load movie genres</p>';
+                document.getElementById('tv-genres-list').innerHTML = '<p class="error">Failed to load TV genres</p>';
+            }
+        });
+    </script>
+{% endblock %}

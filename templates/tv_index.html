@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="movie-carousel-container">
+    <div class="movie-carousel">
+        {% for show in trending_shows.results[:7] %}
+        <div class="carousel-slide {% if loop.first %}active{% endif %}" data-slide-index="{{ loop.index0 }}">
+            <div class="carousel-backdrop" style="background-image: url('{{ show.backdrop_url }}');">
+                <div class="carousel-overlay"></div>
+            </div>
+            <div class="carousel-content">
+                <h2 class="carousel-title">{{ show.name }}</h2>
+                <p class="carousel-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</p>
+                <p class="carousel-rating"><i class="fas fa-star"></i> {{ show.vote_average|round(1) }}</p>
+                <div class="carousel-actions">
+                    <a href="{{ url_for('watch_tv', tv_id=show.id) }}" class="btn-primary">
+                        <i class="fas fa-play"></i> Watch Now
+                    </a>
+                    <a href="{{ url_for('tv_detail', tv_id=show.id) }}" class="btn-secondary">
+                        <i class="fas fa-info-circle"></i> Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <button class="carousel-arrow carousel-prev" aria-label="Previous slide">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-arrow carousel-next" aria-label="Next slide">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <div class="carousel-indicators">
+            {% for show in trending_shows.results[:7] %}
+            <button class="carousel-indicator {% if loop.first %}active{% endif %}" data-slide-index="{{ loop.index0 }}" aria-label="Go to slide {{ loop.index }}"></button>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="trending" class="movie-section">
+    <div class="section-header">
+        <h2>Trending This Week</h2>
+        <a href="{{ url_for('trending_tv_shows') }}" class="view-all">View All</a>
+    </div>
+    
+    <div class="movie-slider">
+        <div class="movie-grid">
+            {% for show in trending_shows.results[:12] %}
+            {% if show.poster_url %}
+            <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+                <div class="movie-poster">
+                    <img src="{{ show.poster_url }}" alt="{{ show.name }} Poster">
+                </div>
+                <div class="movie-info">
+                    <h4>{{ show.name }}</h4>
+                    <p class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</p>
+                    <p class="movie-rating">
+                        <i class="fas fa-star"></i> {{ show.vote_average|round(1) }}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="popular" class="movie-section">
+    <div class="section-header">
+        <h2>Popular TV Shows</h2>
+        <a href="{{ url_for('popular_tv_shows') }}" class="view-all">View All</a>
+    </div>
+    
+    <div class="movie-slider">
+        <div class="movie-grid">
+        {% for show in popular_shows.results %}
+        {% if show.poster_url %}
+        <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+            <div class="movie-poster">
+                <img src="{{ show.poster_url }}" alt="{{ show.name }} Poster">
+            </div>
+            <div class="movie-info">
+                <h4>{{ show.name }}</h4>
+                <p class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</p>
+                <p class="movie-rating">
+                    <i class="fas fa-star"></i> {{ show.vote_average|round(1) }}
+                </p>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

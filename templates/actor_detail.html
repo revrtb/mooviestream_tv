@@ -1,0 +1,281 @@
+{% extends "layout.html" %}
+{% from "partials/breadcrumb.html" import breadcrumb %}
+
+{% block content %}
+    {{ breadcrumb([
+        {'text': 'Actors', 'url': '#'},
+        {'text': actor.name}
+    ]) }}
+<div class="actor-container">
+    <div class="actor-header">
+        <div class="actor-profile">
+            {% if actor.profile_url %}
+            <img src="{{ actor.profile_url }}" alt="{{ actor.name }}" class="actor-image">
+            {% else %}
+            <div class="no-profile">No Image</div>
+            {% endif %}
+        </div>
+        <div class="actor-info">
+            <h1>{{ actor.name }}</h1>
+            {% if actor.birthday %}
+            <div class="actor-meta">
+                <span class="actor-birthday">
+                    <i class="fas fa-birthday-cake"></i> {{ actor.birthday }}
+                    {% if actor.deathday %}
+                    - {{ actor.deathday }}
+                    {% endif %}
+                </span>
+                {% if actor.place_of_birth %}
+                <span class="actor-birthplace">
+                    <i class="fas fa-map-marker-alt"></i> {{ actor.place_of_birth }}
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% if actor.biography %}
+            <div class="actor-biography">
+                <h3>Biography</h3>
+                <p class="biography-text">{{ actor.biography }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if actor.movie_credits and actor.movie_credits.cast %}
+    <div class="actor-filmography">
+        <h2>Movies</h2>
+        <div class="movie-slider">
+            <div class="movie-grid">
+                {% for movie in actor.movie_credits.cast %}
+                {% if movie.poster_url %}
+                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('movie_detail', movie_id=movie.id) }}">
+                    <div class="movie-poster">
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-img">
+                    </div>
+                    <div class="movie-info">
+                        <h4>{{ movie.title }}</h4>
+                        <div class="movie-meta">
+                            <span class="movie-year">{{ movie.release_date[:4] if movie.release_date else 'N/A' }}</span>
+                            <span class="movie-rating"><i class="fas fa-star"></i> {{ movie.vote_average|round(1) }}</span>
+                            {% if movie.character %}
+                            <p class="movie-character">as {{ movie.character }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if actor.tv_credits and actor.tv_credits.cast %}
+    <div class="actor-filmography">
+        <h2>TV Shows</h2>
+        <!-- 
+            Only showing TV shows where this actor is in the cast list.
+            actor.tv_credits.cast contains only TV shows where this actor appears in the cast.
+        -->
+        <div class="movie-slider">
+            <div class="movie-grid">
+                {% for show in actor.tv_credits.cast %}
+                {% if show.character and show.poster_url and not (show.character == actor.name or "Self" in show.character or "Himself" in show.character or "Herself" in show.character) %}
+                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+                    <div class="movie-poster">
+                        <img src="{{ show.poster_url }}" alt="{{ show.name }}" class="movie-poster-img">
+                    </div>
+                    <div class="movie-info">
+                        <h4>{{ show.name }}</h4>
+                        <div class="movie-meta">
+                            <span class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</span>
+                            <span class="movie-rating"><i class="fas fa-star"></i> {{ show.vote_average|round(1) }}</span>
+                            {% if show.character %}
+                            <p class="movie-character">as {{ show.character }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .actor-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .actor-header {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+    
+    .actor-profile {
+        flex: 0 0 300px;
+    }
+    
+    .actor-image {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .no-profile {
+        width: 100%;
+        height: 450px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #333;
+        color: #fff;
+        border-radius: 8px;
+        font-size: 1.2rem;
+    }
+    
+    .actor-info {
+        flex: 1;
+    }
+    
+    .actor-info h1 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 2.5rem;
+    }
+    
+    .actor-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+        color: #fff;
+    }
+    
+    .actor-meta i {
+        margin-right: 5px;
+        color: #1962BE;
+    }
+    
+    .actor-biography {
+        margin-bottom: 30px;
+    }
+    
+    .actor-biography h3 {
+        margin-bottom: 10px;
+        color: #fff;
+    }
+    
+    .actor-biography p.biography-text {
+        line-height: 1.6;
+        color: #fff;
+    }
+    
+    .actor-filmography {
+        margin-bottom: 40px;
+    }
+    
+    .actor-filmography h2 {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    
+    .movie-grid {
+        display: flex;
+        gap: 20px;
+        padding: 5px 0;
+    }
+    
+    .movie-card {
+        flex: 0 0 185px;
+        transition: transform 0.3s ease;
+    }
+    
+    .movie-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .movie-card a {
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .movie-poster {
+        width: 100%;
+        height: 278px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+    
+    .no-poster {
+        width: 100%;
+        height: 278px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .movie-info h4 {
+        margin: 10px 0 5px;
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .movie-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .movie-rating i {
+        color: #1962BE;
+        margin-right: 3px;
+    }
+    
+    .movie-character {
+        font-size: 0.85rem;
+        color: #666;
+        font-style: italic;
+        margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .actor-header {
+            flex-direction: column;
+        }
+        
+        .actor-profile {
+            flex: 0 0 auto;
+            max-width: 250px;
+            margin: 0 auto 20px;
+        }
+        
+        .actor-info h1 {
+            text-align: center;
+        }
+        
+        .actor-meta {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}

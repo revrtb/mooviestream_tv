@@ -1,0 +1,335 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% if ajax is defined and ajax %}
+    {% for item in results.results %}
+    {% set item_media_type = item.media_type|default(media_type) %}
+    
+    {% if (item_media_type == 'person' and item.profile_url) or (item_media_type != 'person' and item.poster_url) %}
+    <div class="movie-card" tabindex="0" role="button" data-detail-href="{% if item_media_type == 'person' %}{{ url_for('actor_detail', actor_id=item.id) }}{% elif item_media_type == 'tv' %}{{ url_for('tv_detail', tv_id=item.id) }}{% else %}{{ url_for('movie_detail', movie_id=item.id) }}{% endif %}">
+        {% if item_media_type == 'person' %}
+            <!-- Actor Card -->
+            <div class="movie-poster">
+                <img src="{{ item.profile_url }}" alt="{{ item.name }} Photo">
+            </div>
+            <div class="movie-info">
+                <h4>{{ item.name }}</h4>
+                {% if item.known_for_titles %}
+                <p class="known-for">
+                    Known for: {{ item.known_for_titles|join(', ') }}
+                </p>
+                {% endif %}
+            </div>
+        {% elif item_media_type == 'tv' %}
+            <!-- TV Show Card -->
+            <div class="movie-poster">
+                <img src="{{ item.poster_url }}" alt="{{ item.name }} Poster">
+            </div>
+            <div class="movie-info">
+                <h4>{{ item.name }}</h4>
+                <p class="movie-year">{{ item.first_air_date[:4] if item.first_air_date else 'N/A' }}</p>
+                <p class="movie-rating">
+                    <i class="fas fa-star"></i> {{ item.vote_average|round(1) }}
+                </p>
+            </div>
+        {% else %}
+            <!-- Movie Card -->
+            <div class="movie-poster">
+                <img src="{{ item.poster_url }}" alt="{{ item.title }} Poster">
+            </div>
+            <div class="movie-info">
+                <h4>{{ item.title }}</h4>
+                <p class="movie-year">{{ item.release_date[:4] if item.release_date else 'N/A' }}</p>
+                <p class="movie-rating">
+                    <i class="fas fa-star"></i> {{ item.vote_average|round(1) }}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endfor %}
+{% else %}
+<div class="search-results" 
+    {% if is_trending is defined and is_trending %}
+        data-page-type="trending" 
+        data-media-type="{{ media_type }}" 
+        {% if time_window is defined %}data-time-window="{{ time_window }}"{% endif %}
+    {% elif is_popular is defined and is_popular %}
+        data-page-type="popular" 
+        data-media-type="{{ media_type }}"
+    {% elif is_top_rated is defined and is_top_rated %}
+        data-page-type="top_rated" 
+        data-media-type="{{ media_type }}"
+    {% elif is_recent is defined and is_recent %}
+        data-page-type="recent" 
+        data-media-type="{{ media_type }}"
+    {% else %}
+        data-page-type="search" 
+        data-media-type="{{ media_type }}" 
+        {% if query is defined %}data-query="{{ query }}"{% endif %}
+    {% endif %}
+    data-current-page="{{ current_page }}"
+    data-has-more="{{ has_more|default(false)|lower }}"
+    data-next-page="{{ next_page|default(0) }}"
+    id="infinite-scroll-container">
+    <div class="search-header">
+        {% if is_trending is defined and is_trending %}
+            {% if media_type == 'tv' %}
+                <h2>Trending TV Shows</h2>
+            {% else %}
+                <h2>Trending Movies</h2>
+            {% endif %}
+        {% elif is_popular is defined and is_popular %}
+            {% if media_type == 'tv' %}
+                <h2>Popular TV Shows</h2>
+            {% else %}
+                <h2>Popular Movies</h2>
+            {% endif %}
+        {% elif is_top_rated is defined and is_top_rated %}
+            {% if media_type == 'tv' %}
+                <h2>Top Rated TV Shows</h2>
+            {% else %}
+                <h2>Top Rated Movies</h2>
+            {% endif %}
+        {% elif is_recent is defined and is_recent %}
+            {% if media_type == 'tv' %}
+                <h2>Recently Released TV Shows</h2>
+            {% else %}
+                <h2>Recently Released Movies</h2>
+            {% endif %}
+        {% else %}
+            <h2>Search Results for "{{ query }}"</h2>
+            
+            <!-- Media type filter tabs -->
+            <div class="media-type-tabs">
+                <a href="{{ url_for('search', query=query, media_type='all') }}" 
+                   class="tab {% if media_type == 'all' %}active{% endif %}">All</a>
+                <a href="{{ url_for('search', query=query, media_type='movie') }}" 
+                   class="tab {% if media_type == 'movie' %}active{% endif %}">Movies</a>
+                <a href="{{ url_for('search', query=query, media_type='tv') }}" 
+                   class="tab {% if media_type == 'tv' %}active{% endif %}">TV Shows</a>
+                <a href="{{ url_for('search', query=query, media_type='person') }}" 
+                   class="tab {% if media_type == 'person' %}active{% endif %}">Actors</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if results.results %}
+    <div class="movie-grid" id="movie-grid">
+        {% for item in results.results %}
+        {% set item_media_type = item.media_type|default(media_type) %}
+        
+        {% if (item_media_type == 'person' and item.profile_url) or (item_media_type != 'person' and item.poster_url) %}
+        <div class="movie-card" tabindex="0" role="button" data-detail-href="{% if item_media_type == 'person' %}{{ url_for('actor_detail', actor_id=item.id) }}{% elif item_media_type == 'tv' %}{{ url_for('tv_detail', tv_id=item.id) }}{% else %}{{ url_for('movie_detail', movie_id=item.id) }}{% endif %}">
+            {% if item_media_type == 'person' %}
+                <!-- Actor Card -->
+                <div class="movie-poster">
+                    <img src="{{ item.profile_url }}" alt="{{ item.name }} Photo">
+                </div>
+                <div class="movie-info">
+                    <h4>{{ item.name }}</h4>
+                    {% if item.known_for_titles %}
+                    <p class="known-for">
+                        Known for: {{ item.known_for_titles|join(', ') }}
+                    </p>
+                    {% endif %}
+                </div>
+            {% elif item_media_type == 'tv' %}
+                <!-- TV Show Card -->
+                <div class="movie-poster">
+                    <img src="{{ item.poster_url }}" alt="{{ item.name }} Poster">
+                </div>
+                <div class="movie-info">
+                    <h4>{{ item.name }}</h4>
+                    <p class="movie-year">{{ item.first_air_date[:4] if item.first_air_date else 'N/A' }}</p>
+                    <p class="movie-rating">
+                        <i class="fas fa-star"></i> {{ item.vote_average|round(1) }}
+                    </p>
+                </div>
+            {% else %}
+                <!-- Movie Card -->
+                <div class="movie-poster">
+                    <img src="{{ item.poster_url }}" alt="{{ item.title }} Poster">
+                </div>
+                <div class="movie-info">
+                    <h4>{{ item.title }}</h4>
+                    <p class="movie-year">{{ item.release_date[:4] if item.release_date else 'N/A' }}</p>
+                    <p class="movie-rating">
+                        <i class="fas fa-star"></i> {{ item.vote_average|round(1) }}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    
+    <!-- Loading indicator for infinite scroll -->
+    <div id="loading-indicator" class="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading more content...</p>
+    </div>
+    
+    {% else %}
+    <div class="no-results">
+        <i class="fas fa-search fa-3x"></i>
+        {% if is_trending is defined and is_trending %}
+            {% if media_type == 'tv' %}
+                <h3>No trending TV shows found</h3>
+                <p>Try again later or check a different time window.</p>
+                <a href="{{ url_for('tv_index') }}" class="btn-primary">Back to TV Shows</a>
+            {% else %}
+                <h3>No trending movies found</h3>
+                <p>Try again later or check a different time window.</p>
+                <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+            {% endif %}
+        {% elif is_popular is defined and is_popular %}
+            {% if media_type == 'tv' %}
+                <h3>No popular TV shows found</h3>
+                <p>Try again later or check back soon for updates.</p>
+                <a href="{{ url_for('tv_index') }}" class="btn-primary">Back to TV Shows</a>
+            {% else %}
+                <h3>No popular movies found</h3>
+                <p>Try again later or check back soon for updates.</p>
+                <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+            {% endif %}
+        {% elif is_recent is defined and is_recent %}
+            {% if media_type == 'tv' %}
+                <h3>No recently released TV shows found</h3>
+                <p>Try again later or check back soon for updates.</p>
+                <a href="{{ url_for('tv_index') }}" class="btn-primary">Back to TV Shows</a>
+            {% else %}
+                <h3>No recently released movies found</h3>
+                <p>Try again later or check back soon for updates.</p>
+                <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+            {% endif %}
+        {% else %}
+            {% if media_type == 'person' %}
+                <h3>No actors found</h3>
+                <p>Try different keywords or check your spelling.</p>
+                <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+            {% elif media_type == 'tv' %}
+                <h3>No TV shows found</h3>
+                <p>Try different keywords or check your spelling.</p>
+                <a href="{{ url_for('tv_index') }}" class="btn-primary">Back to TV Shows</a>
+            {% elif media_type == 'movie' %}
+                <h3>No movies found</h3>
+                <p>Try different keywords or check your spelling.</p>
+                <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+            {% else %}
+                <h3>No results found</h3>
+                <p>Try different keywords or check your spelling.</p>
+                <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endif %}
+
+<style>
+    /* Loading indicator styles */
+    .loading-indicator {
+        text-align: center;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #1962BE;
+        animation: spin 1s ease-in-out infinite;
+        margin-bottom: 10px;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Additional styles specific to search results */
+    .search-header {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #ddd;
+        margin-top: 15px;
+    }
+    
+    .search-header h2 {
+        margin-bottom: 5px;
+    }
+    
+    .results-count {
+        color: #1962BE;
+        font-style: italic;
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+    
+    /* Media type tabs */
+    .media-type-tabs {
+        display: flex;
+        margin: 20px 0;
+        border-bottom: 1px solid #444;
+        padding: 5px 0;
+    }
+    
+    .media-type-tabs .tab {
+        padding: 10px 20px;
+        margin-right: 5px;
+        background-color: #333;
+        color: #fff;
+        border-radius: 5px 5px 0 0;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+    
+    .media-type-tabs .tab:hover {
+        background-color: #444;
+        text-decoration: none;
+    }
+    
+    .media-type-tabs .tab.active {
+        background-color: #1962BE;
+        color: #fff;
+    }
+    
+    /* Known for text in actor cards */
+    .known-for {
+        font-size: 0.8rem;
+        color: #aaa;
+        margin-top: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 50px 20px;
+        background-color: #2a2d39;
+        border-radius: 8px;
+        margin: 30px 0;
+    }
+    
+    .no-results i {
+        color: #444;
+        margin-bottom: 20px;
+    }
+    
+    .no-results h3 {
+        margin-bottom: 10px;
+    }
+    
+    .no-results p {
+        margin-bottom: 20px;
+        color: #aaa;
+    }
+</style>
+{% endblock %}

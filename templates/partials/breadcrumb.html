@@ -1,0 +1,77 @@
+{% macro breadcrumb(items) %}
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <ol class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+        <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <a itemprop="item" href="{{ url_for('index') }}">
+                <span itemprop="name">Home</span>
+            </a>
+            <meta itemprop="position" content="1" />
+        </li>
+        
+        {% for item in items %}
+            <li class="breadcrumb-item {% if loop.last %}active{% endif %}" 
+                itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                {% if not loop.last and item.url %}
+                    <a itemprop="item" href="{{ item.url }}">
+                        <span itemprop="name">{{ item.text }}</span>
+                    </a>
+                {% else %}
+                    <span itemprop="name">{{ item.text }}</span>
+                {% endif %}
+                <meta itemprop="position" content="{{ loop.index + 1 }}" />
+            </li>
+        {% endfor %}
+    </ol>
+</nav>
+
+<style>
+    .breadcrumb-nav {
+        margin-bottom: 1.5rem;
+        padding: 0.5rem 0;
+    }
+    
+    .breadcrumb {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        background-color: transparent;
+    }
+    
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        color: #777;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb-item a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .breadcrumb-item a:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        color: white;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "/";
+        display: inline-block;
+        padding: 0 0.5rem;
+        color: #777;
+    }
+    
+    @media (max-width: 576px) {
+        .breadcrumb {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endmacro %}

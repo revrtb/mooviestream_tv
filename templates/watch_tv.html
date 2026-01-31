@@ -1,0 +1,714 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- <script type="text/javascript" src="/watch_page"></script> -->
+<div class="watch-container">
+    <div class="watch-header">
+        <div class="watch-header-poster">
+            {% if show.poster_url %}
+            <a href="{{ url_for('tv_detail', tv_id=show.id) }}">
+                <img src="{{ show.poster_url }}" alt="{{ show.name }}" class="movie-poster">
+            </a>
+            {% else %}
+            <div class="no-poster">No Poster</div>
+            {% endif %}
+        </div>
+        <div class="watch-header-content">
+            <h1>{{ show.name }}</h1>
+            <div class="movie-meta" style="display: block !important;">
+                <span class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</span>
+                <span class="movie-runtime">{{ show.number_of_seasons }} Season{% if show.number_of_seasons != 1 %}s{% endif %}</span>
+                <span class="movie-runtime">{{ show.number_of_episodes }} Episode{% if show.number_of_episodes != 1 %}s{% endif %}</span>
+                <span class="movie-rating">
+                    <i class="fas fa-star"></i> {{ show.vote_average|round(1) }}
+                </span>
+            </div>
+            <a href="{{ url_for('tv_detail', tv_id=show.id) }}" class="btn-secondary movie_details" style="margin: 0px !important;">
+                <i class="fas fa-info-circle"></i> Show Details
+            </a>
+        </div>
+    </div>
+    
+    <div class="player-container">
+        <div class="player-selector">
+            {% if embess_url %}
+            <button class="player-btn active" data-player="vast">Player one</button>
+            {% endif %}
+            <button class="player-btn {% if not embess_url %}active{% endif %}" data-player="vidsrc">Player two</button>
+        </div>
+        
+        <div class="player-wrapper">
+            <iframe 
+                id="player-iframe"
+                src=""
+                data-src="{% if embess_url %}{{ embess_url }}{% else %}{{ vidsrc_url }}{% endif %}"
+                frameborder="0" 
+                allowfullscreen 
+                allow="autoplay; picture-in-picture; fullscreen"
+                class="movie-player"
+                style="display: none;">
+            </iframe>
+
+            <!-- VAST Ad Player -->
+            <div id="vast-player-container" class="vast-player-container" style="display: block;">
+                <div id="vast-loading" class="vast-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading ads...</p>
+                </div>
+                <video
+                    id="vast-player"
+                    class="video-js vjs-default-skin vjs-big-play-centered"
+                    controls
+                    preload="none"
+                    width="100%"
+                    height="100%"
+                    disablePictureInPicture="false"
+                    data-setup='{}'>
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a
+                        web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+                    </p>
+                </video>
+            </div>
+        </div>
+        
+        <div class="player-notice">
+            <p>
+                <i class="fas fa-exclamation-circle"></i> 
+                Multiple player options are available. If one player doesn't work, try another.
+                We do not host any content. If no players load, the TV show might not be available. You can switch the language from the player dropdown menu.                
+            </p>
+        </div>
+    </div>
+    
+    <div class="watch-info">
+        <div class="movie-overview">
+            <h3>Overview</h3>
+            <p>{{ show.overview }}</p>
+        </div>
+        
+        <div class="movie-genres">
+            <h3>Genres</h3>
+            <div class="genre-tags">
+                {% for genre in show.genres %}
+                <a href="{{ url_for('tv_genre', genre_id=genre.id) }}" class="genre-tag">{{ genre.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        {% if show.credits and show.credits.cast %}
+        <div class="movie-cast">
+            <h3>Cast</h3>
+            <div class="cast-list">
+                {% for actor in show.credits.cast[:6] %}
+                <div class="cast-member">
+                    <a href="{{ url_for('actor_detail', actor_id=actor.id) }}" class="actor-link">
+                        {% if actor.profile_url %}
+                        <img src="{{ actor.profile_url }}" alt="{{ actor.name }}" class="cast-photo">
+                        {% else %}
+                        <div class="no-photo">No Photo</div>
+                        {% endif %}
+                        <div class="cast-info">
+                            <p class="cast-name">{{ actor.name }}</p>
+                            <p class="cast-character">{{ actor.character }}</p>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if related_shows %}
+    <div class="related-movies">
+        <h3>You Might Also Like</h3>
+        <div class="movie-slider">
+            <div class="movie-grid">
+                {% for show in related_shows %}
+                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+                    <div class="movie-poster">
+                        {% if show.poster_url %}
+                        <img src="{{ show.poster_url }}" alt="{{ show.name }}" class="movie-poster-img">
+                        {% else %}
+                        <div class="no-poster">No Poster</div>
+                        {% endif %}
+                    </div>
+                    <div class="movie-info">
+                        <h4>{{ show.name }}</h4>
+                        <div class="movie-meta">
+                            <span class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</span>
+                            <span class="movie-rating"><i class="fas fa-star"></i> {{ show.vote_average|round(1) }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Player switching functionality
+        const playerIframe = document.getElementById('player-iframe');
+        const playerBtns = document.querySelectorAll('.player-btn');
+        const vastPlayerContainer = document.getElementById('vast-player-container');
+        
+        // Append autoplay param to embed URLs (many embeds support ?autoplay=1)
+        function urlWithAutoplay(url) {
+            if (!url) return url;
+            try {
+                var u = new URL(url, window.location.origin);
+                u.searchParams.set('autoplay', '1');
+                return u.toString();
+            } catch (e) { return url; }
+        }
+        
+        // Store player URLs (with autoplay for iframe)
+        const playerUrls = {
+            vidsrc: urlWithAutoplay("{{ vidsrc_url }}"),
+            embess: urlWithAutoplay("{{ embess_url }}")
+        };
+        
+        // VAST Configuration
+        const vastConfig = {
+            vastUrl: 'https://cpm.revrtb.com/vast?zone=273767&subid=test123&page_url=' + encodeURIComponent(window.location.href) + '&w=640&h=360&startdelay=0&linearity=1&ip=127.0.0.1&ua=' + encodeURIComponent(navigator.userAgent),
+            timeout: 5000
+        };
+
+        // VAST Player Variables
+        let vastPlayer = null;
+        
+        // Initialize VAST player on page load since it's the default
+        if (document.querySelector('.player-btn[data-player="vast"]').classList.contains('active')) {
+            console.log('VAST player is default, initializing...');
+            initializeVastPlayer();
+        }
+
+        // Initialize VAST Player
+        function initializeVastPlayer() {
+            console.log('Initializing VAST player...');
+            
+            // Check if Video.js is available
+            if (typeof videojs === 'undefined') {
+                console.error('Video.js not loaded!');
+                switchToEmbessPlayer();
+                return;
+            }
+            
+            console.log('Video.js is available');
+            
+            // Hide loading indicator
+            const loadingIndicator = document.getElementById('vast-loading');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            try {
+                // Dispose existing player
+                if (vastPlayer) {
+                    console.log('Disposing existing player');
+                    vastPlayer.dispose();
+                }
+                
+                console.log('Creating Video.js player...');
+                // Create Video.js player
+                vastPlayer = videojs('vast-player', {
+                    controls: true,
+                    autoplay: true,
+                    muted: true,
+                    preload: 'auto',
+                    fluid: true,
+                    responsive: true
+                });
+                
+                console.log('Video.js player created successfully');
+                
+                // Don't set any source initially - wait for VAST response
+                
+                // Fallback: Start VAST ad flow after a short delay
+                setTimeout(() => {
+                    if (vastPlayer && vastPlayer.readyState() >= 0) {
+                        console.log('VAST player ready (fallback)');
+                        startVastAdFlow();
+                    }
+                }, 500);
+                
+                // Handle player ready – wait for UI then focus play button for keyboard/remote
+                vastPlayer.on('ready', function() {
+                    console.log('VAST player ready');
+                    // Start VAST ad flow after a short delay
+                    setTimeout(() => {
+                        startVastAdFlow();
+                    }, 100);
+                    // Wait for player UI to be in DOM, then focus big play button
+                    setTimeout(function focusPlayButton() {
+                        var el = vastPlayer && vastPlayer.el && vastPlayer.el();
+                        var playBtn = el ? el.querySelector('.vjs-big-play-button') : null;
+                        if (playBtn) {
+                            playBtn.setAttribute('tabindex', '0');
+                            playBtn.focus();
+                        }
+                    }, 150);
+                });
+                
+                // Handle errors
+                vastPlayer.on('error', function() {
+                    console.error('VAST player error:', vastPlayer.error());
+                    switchToEmbessPlayer();
+                });
+                
+            } catch (error) {
+                console.error('Error initializing VAST player:', error);
+                switchToEmbessPlayer();
+            }
+        }
+
+        // Start VAST Ad Flow
+        function startVastAdFlow() {
+            console.log('Starting VAST ad flow...');
+            
+            // Call VAST URL
+            fetch(vastConfig.vastUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/xml, text/xml, */*',
+                    'User-Agent': navigator.userAgent
+                }
+            })
+            .then(response => {
+                console.log('VAST response status:', response.status);
+                return response.text();
+            })
+            .then(vastXml => {
+                console.log('VAST response received:', vastXml.substring(0, 200) + '...');
+                
+                // Parse VAST XML
+                const parser = new DOMParser();
+                const vastDoc = parser.parseFromString(vastXml, 'text/xml');
+                const mediaFile = vastDoc.querySelector('MediaFile');
+                
+                if (mediaFile && mediaFile.textContent) {
+                    const adVideoUrl = mediaFile.textContent.trim();
+                    console.log('Found ad video URL:', adVideoUrl);
+                    
+                    if (adVideoUrl && adVideoUrl.startsWith('http')) {
+                        // Load and play ad video
+                        console.log('Loading ad video:', adVideoUrl);
+                        vastPlayer.src({ type: 'video/mp4', src: adVideoUrl });
+                        
+                        // Add error handling for video loading
+                        vastPlayer.on('error', function() {
+                            console.error('Error loading ad video:', vastPlayer.error());
+                            console.log('Falling back to embess player');
+                            switchToEmbessPlayer();
+                        });
+                        
+                        // Play when player is loaded and ready (canplay = enough data to play)
+                        vastPlayer.one('canplay', function() {
+                            console.log('Ad video loaded and ready');
+                            vastPlayer.play();
+                            setTimeout(() => {
+                                console.log('Ad finished, switching to embess player');
+                                switchToEmbessPlayer();
+                            }, 5000);
+                        });
+                    } else {
+                        console.log('Invalid ad URL, switching to embess player');
+                        switchToEmbessPlayer();
+                    }
+                } else {
+                    console.log('No ad found in VAST, switching to embess player');
+                    switchToEmbessPlayer();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching VAST:', error);
+                console.log('VAST fetch failed, switching to embess player');
+                switchToEmbessPlayer();
+            });
+        }
+
+        // Show Simulated Ad
+        function showSimulatedAd() {
+            console.log('Showing simulated ad');
+            
+            // Hide the Video.js player controls and show simulated ad overlay
+            const playerElement = document.getElementById('vast-player');
+            if (playerElement) {
+                // Hide Video.js controls
+                const videoJsElement = playerElement.querySelector('.video-js');
+                if (videoJsElement) {
+                    videoJsElement.style.display = 'none';
+                }
+                
+                // Create and show ad overlay
+                const adOverlay = document.createElement('div');
+                adOverlay.id = 'ad-overlay';
+                adOverlay.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: #000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                `;
+                adOverlay.innerHTML = `
+                    <div style="color: white; font-size: 24px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🎬</div>
+                        <div style="font-size: 28px; margin-bottom: 10px;">Ad Playing...</div>
+                        <div style="font-size: 16px; color: #ccc;">Please wait</div>
+                    </div>
+                `;
+                
+                // Add overlay to player container
+                const playerContainer = document.getElementById('vast-player-container');
+                if (playerContainer) {
+                    playerContainer.style.position = 'relative';
+                    playerContainer.appendChild(adOverlay);
+                }
+            }
+            
+            setTimeout(() => {
+                console.log('Simulated ad finished, switching to embess player');
+                switchToEmbessPlayer();
+            }, 5000);
+        }
+
+        // Switch to Embess Player
+        function switchToEmbessPlayer() {
+            console.log('Switching to embess player...');
+            
+            // Clean up ad overlay
+            const adOverlay = document.getElementById('ad-overlay');
+            if (adOverlay) {
+                console.log('Removing ad overlay');
+                adOverlay.remove();
+            }
+            
+            // Reset Video.js player display
+            const playerElement = document.getElementById('vast-player');
+            if (playerElement) {
+                const videoJsElement = playerElement.querySelector('.video-js');
+                if (videoJsElement) {
+                    videoJsElement.style.display = 'block';
+                }
+            }
+            
+            // Hide VAST player
+            console.log('Hiding VAST player container');
+            vastPlayerContainer.style.display = 'none';
+            
+            // Show iframe player
+            console.log('Showing iframe player');
+            playerIframe.style.display = 'block';
+            
+            // Set embess URL with autoplay (show auto-plays when embed is loaded and ready)
+            playerIframe.src = playerUrls.embess || urlWithAutoplay('{{ embess_url }}');
+            playerIframe.setAttribute('tabindex', '0');
+            playerIframe.onload = function() {
+                playerIframe.focus();
+            };
+            
+            console.log('Switch to embess player completed');
+        }
+        
+        // Add click event to player buttons
+        playerBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                playerBtns.forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get player type from data attribute
+                const playerType = this.getAttribute('data-player');
+                
+                if (playerType === 'vast') {
+                    // Show VAST player
+                    playerIframe.style.display = 'none';
+                    vastPlayerContainer.style.display = 'block';
+                    
+                    // Initialize VAST player
+                    initializeVastPlayer();
+                    
+                    // Backup: Start VAST ad flow after initialization
+                    setTimeout(() => {
+                        console.log('Backup: Starting VAST ad flow');
+                        startVastAdFlow();
+                    }, 1000);
+                } else {
+                    // Show iframe player
+                    playerIframe.style.display = 'block';
+                    vastPlayerContainer.style.display = 'none';
+                    
+                    // Update iframe src
+                    if (playerUrls[playerType]) {
+                        playerIframe.src = playerUrls[playerType];
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Additional styles specific to the watch page */
+    .watch-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    
+    .watch-header {
+        margin-bottom: 20px;
+        margin-left: 0px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 30px;
+    }
+    
+    .watch-header-content {
+        flex: 1;
+    }
+    
+    .watch-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    
+    .watch-header-poster {
+        width: 120px;
+        flex-shrink: 0;
+    }
+    
+    .watch-header-poster img {
+        width: 100%;
+        height: 160px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .watch-header-poster .no-poster {
+        width: 100%;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+    }
+    
+    .player-container {
+        margin-bottom: 30px;
+        background-color: #000;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .player-selector {
+        display: flex;
+        background-color: #111;
+        padding: 10px 15px;
+        border-bottom: 1px solid #222;
+    }
+    
+    .player-btn {
+        background-color: transparent;
+        color: #aaa;
+        border: none;
+        padding: 8px 15px;
+        margin-right: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .player-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+    
+    .player-btn.active {
+        background-color: #1962BE;
+        color: #fff;
+    }
+    
+    .player-wrapper {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+    }
+    
+    .movie-player {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    .player-notice {
+        padding: 10px 15px;
+        background-color: #111;
+        color: #aaa;
+        font-size: 0.9rem;
+    }
+    
+    .player-notice i {
+        color: #1962BE;
+        margin-right: 5px;
+    }
+    
+    .vast-player-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+    }
+    
+    .vast-player-container .video-js {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .vast-loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        z-index: 10;
+    }
+    
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid #1962BE;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .watch-info {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .movie-overview {
+        grid-column: 1;
+    }
+    
+    .movie-genres {
+        grid-column: 2;
+    }
+    
+    .movie-cast {
+        grid-column: 1 / -1;
+    }
+    
+    .genre-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .cast-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .actor-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.2s ease;
+    }
+    
+    .actor-link:hover {
+        transform: translateY(-5px);
+    }
+    
+    .actor-link:hover .cast-name {
+        color: #fff;
+    }
+    
+    .related-movies .coming-soon {
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        text-align: center;
+        color: #666;
+    }
+    
+    @media (max-width: 768px) {
+        .watch-info {
+            grid-template-columns: 1fr;
+        }
+        
+        .movie-genres {
+            grid-column: 1;
+        }
+        
+        .watch-header {
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+        }
+        
+        .watch-header-content {
+            width: 100%;
+            text-align: center;
+            order: -1;
+        }
+        
+        .watch-header-poster {
+            width: 100px;
+            margin-bottom: 0px;
+        }
+
+        .watch-header-poster img {
+            width: 100%;
+            height: 160px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .movie_details {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}

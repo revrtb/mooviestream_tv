@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="movie-detail">
+    {% if movie.backdrop_url %}
+    <div class="movie-backdrop" style="background-image: url('{{ movie.backdrop_url }}');">
+        <div class="backdrop-overlay"></div>
+    </div>
+    {% endif %}
+    
+    <div class="movie-detail-content">
+        <div class="movie-poster-container">
+            {% if movie.poster_url %}
+            <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" class="movie-poster">
+            {% else %}
+            <div class="no-poster">No Poster Available</div>
+            {% endif %}
+            
+            <div class="movie-actions">
+                <a href="{{ url_for('watch_movie', movie_id=movie.id) }}" class="btn-primary btn-watch">
+                    <i class="fas fa-play"></i> Watch Now
+                </a>
+            </div>
+        </div>
+        
+        <div class="movie-info-container">
+            <h1 class="movie-title">{{ movie.title }}</h1>
+            
+            {% if movie.tagline %}
+            <p class="movie-tagline">"{{ movie.tagline }}"</p>
+            {% endif %}
+            
+            <div class="movie-meta">
+                <span class="movie-year">{{ movie.release_date[:4] if movie.release_date else 'N/A' }}</span>
+                <span class="movie-runtime">{{ movie.runtime }} min</span>
+                <span class="movie-rating">
+                    <i class="fas fa-star"></i> {{ movie.vote_average|round(1) }}
+                </span>
+            </div>
+            
+            <div class="movie-genres">
+                {% for genre in movie.genres %}
+                <a href="{{ url_for('genre', genre_id=genre.id) }}" class="genre-tag" tabindex="-1">{{ genre.name }}</a>
+                {% endfor %}
+            </div>
+            
+            <div class="movie-overview">
+                <h3>Overview</h3>
+                <p>{{ movie.overview }}</p>
+            </div>
+            
+            {% if movie.credits and movie.credits.cast %}
+            <div class="movie-cast">
+                <h3>Cast</h3>
+                <div class="cast-list">
+                    {% for actor in movie.credits.cast[:8] %}
+                    <div class="cast-member">
+                        <a href="{{ url_for('actor_detail', actor_id=actor.id) }}" class="actor-link">
+                            {% if actor.profile_url %}
+                            <img src="{{ actor.profile_url }}" alt="{{ actor.name }}" class="cast-photo">
+                            {% else %}
+                            <div class="no-photo">No Photo</div>
+                            {% endif %}
+                            <div class="cast-info">
+                                <p class="cast-name">{{ actor.name }}</p>
+                                <p class="cast-character">{{ actor.character }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="movie-details">
+                <h3>Details</h3>
+                <table class="details-table">
+                    <tr>
+                        <th>Status:</th>
+                        <td>{{ movie.status }}</td>
+                    </tr>
+                    <tr>
+                        <th>Release Date:</th>
+                        <td>{{ movie.release_date }}</td>
+                    </tr>
+                    {% if movie.budget > 0 %}
+                    <tr>
+                        <th>Budget:</th>
+                        <td>${{ '{:,}'.format(movie.budget) }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if movie.revenue > 0 %}
+                    <tr>
+                        <th>Revenue:</th>
+                        <td>${{ '{:,}'.format(movie.revenue) }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if movie.production_companies %}
+                    <tr>
+                        <th>Production:</th>
+                        <td>{{ movie.production_companies|map(attribute='name')|join(', ') }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .actor-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.2s ease;
+    }
+    
+    .actor-link:hover {
+        transform: translateY(-5px);
+    }
+    
+    .actor-link:hover .cast-name {
+        color: #fff;
+    }
+</style>
+
+<!-- <div class="iframe-container" style="margin-top: -100px;">
+    <div class="banner-wrapper" style="position: relative; width: 300px; margin-top: 150px;">
+        <iframe id="banner-iframe" src="//cpm.revrtb.com/tag?zone_id=269193&size=300x250&ad_type=iframe" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe>
+    </div>
+    <div class="banner-wrapper" style="position: relative; width: 300px; margin-top: 150px;">
+        <iframe id="banner-iframe" src="//cpm.revrtb.com/tag?zone_id=269193&size=300x250&ad_type=iframe" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe>
+    </div>
+</div> -->
+
+<!-- Related Movies Section -->
+{% if related_movies %}
+<div class="related-section">
+    <div class="related-section">
+        <div class="section-header">
+            <h2>Related movies</h2>
+        </div>
+        
+        <div class="movie-slider">
+            <div class="movie-grid">
+                {% for movie in related_movies %}
+                {% if movie.poster_url %}
+                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('movie_detail', movie_id=movie.id) }}">
+                    <div class="movie-poster">
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-img">
+                    </div>
+                    <div class="movie-info">
+                        <h4>{{ movie.title }}</h4>
+                        <div class="movie-meta">
+                            <span class="movie-year">{{ movie.release_date[:4] if movie.release_date else 'N/A' }}</span>
+                            <span class="movie-rating"><i class="fas fa-star"></i> {{ movie.vote_average|round(1) }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

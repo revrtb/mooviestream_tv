@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Watch Free Movies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: #000;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+    
+        .container {
+        text-align: center;
+        }
+    
+        .icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+        }
+    
+        .title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        }
+    
+        .subtitle {
+        font-size: 16px;
+        color: #ccc;
+        margin-bottom: 10px;
+        }
+    
+        .button {
+        background-color: #FFC107;
+        border: none;
+        padding: 14px 28px;
+        font-size: 16px;
+        font-weight: 600;
+        color: black;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        }
+    
+        .button:hover {
+        background-color: #e6ac00;
+        }
+    </style>
+    </head>
+<body>
+
+<div class="container" id="openTab">
+    <div class="icon">🎬</div>
+    <div class="title">Watch Free<br>Movies & TV Shows</div>
+    <div class="subtitle">HD Streaming · No Signup · 100% Free</div>
+    <button class="button">Start Watching</button>
+</div>
+
+
+<script>
+    document.getElementById("openTab").addEventListener("click", function() {
+    window.top.open("https://flixtheatre.com", "_blank");
+    window.parent.postMessage({ action: "openTab", url: "https://flixtheatre.com" }, "*");
+    });
+</script>
+
+</body>
+</html>

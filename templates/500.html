@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="error-section">
+    <div class="error-container">
+        <h2>500 - Internal Server Error</h2>
+        <div class="error-image">
+            <img src="{{ url_for('static', filename='images/500.png') }}" alt="500 Error">
+        </div>
+        <div class="error-message">
+            <p>Oops! Something went wrong on our end.</p>
+            <p>We're working to fix the issue. Please try again later or contact our support team if the problem persists.</p>
+        </div>
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="btn-primary">Go to Homepage</a>
+            <a href="{{ url_for('contact') }}" class="btn-secondary">Contact Support</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,353 @@
+/**
+ * Smart TV layout and accessibility (WebOS, Tizen, Android TV)
+ * 10-foot UI: 1920×1080 baseline, safe areas, focus-based navigation
+ * No business logic changes; layout and interaction only.
+ */
+
+/* ---------------------------------------------------------------------------
+   TV baseline: min 1920×1080 (1080p) – same style/sizing below this
+   Safe area: 5% or 48px from edges (TV overscan)
+--------------------------------------------------------------------------- */
+@media (min-width: 1920px) and (min-height: 1080px) {
+    :root {
+        --tv-safe: max(5%, 48px);
+        --tv-focus-ring: 4px;
+        --tv-focus-color: #FFD700;
+        --tv-focus-color-alt: #fff;
+        --tv-min-tap: 60px;
+        --tv-font-base: 1.25rem;
+        --tv-line: 1.5;
+    }
+
+    /* Safe area container */
+    body {
+        padding: var(--tv-safe);
+        font-size: var(--tv-font-base);
+        line-height: var(--tv-line);
+    }
+
+    .container {
+        width: 80%;
+        max-width: 1680px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: var(--tv-safe);
+        padding-right: var(--tv-safe);
+    }
+
+    /* -----------------------------------------------------------------------
+       Focus: visible ring on all focusables (no hover-only)
+       High contrast for TV and remote navigation
+    ----------------------------------------------------------------------- */
+    *:focus {
+        outline: var(--tv-focus-ring) solid var(--tv-focus-color);
+        outline-offset: 4px;
+    }
+
+    *:focus:not(:focus-visible) {
+        outline: none;
+    }
+
+    *:focus-visible {
+        outline: var(--tv-focus-ring) solid var(--tv-focus-color);
+        outline-offset: 4px;
+        box-shadow: 0 0 0 6px rgba(255, 215, 0, 0.35);
+    }
+
+    /* Focus = selected state (no hover-only feedback) – highlight current focus */
+    a:focus-visible,
+    button:focus-visible,
+    [tabindex="0"]:focus-visible {
+        outline: var(--tv-focus-ring) solid var(--tv-focus-color);
+        outline-offset: 4px;
+        box-shadow: 0 0 0 6px rgba(255, 215, 0, 0.35);
+    }
+
+    /* Movie cards: strong highlight for 10-foot viewing */
+    .movie-card:focus-visible {
+        outline: 5px solid var(--tv-focus-color);
+        outline-offset: 4px;
+        box-shadow: 0 0 0 8px rgba(255, 215, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.45);
+        z-index: 2;
+        transform: scale(1.02);
+    }
+
+    /* Nav: clear background highlight when focused */
+    .main-nav a:focus-visible,
+    .dropdown-menu a:focus-visible {
+        background-color: rgba(255, 215, 0, 0.25);
+        border-radius: 8px;
+    }
+
+    /* Ensure focus ring is not clipped */
+    .movie-card,
+    .main-nav li,
+    .dropdown-menu,
+    header,
+    .carousel-actions a,
+    .btn-primary,
+    .btn-secondary,
+    .btn-watch {
+        position: relative;
+    }
+
+    /* -----------------------------------------------------------------------
+       Typography: 10-foot viewing (large, high contrast)
+    ----------------------------------------------------------------------- */
+    body {
+        color: #f5f5f5;
+    }
+
+    header h1,
+    .logo-text {
+        font-size: 2.25rem;
+    }
+
+    .main-nav li a {
+        font-size: 1.2rem;
+        padding: 0.6rem 1rem;
+    }
+
+    .dropdown-menu li a {
+        font-size: 1.1rem;
+        padding: 0.75rem 1.25rem;
+    }
+
+    h2, .section-header h2 {
+        font-size: 2rem;
+        margin-bottom: 1.25rem;
+    }
+
+    h3 {
+        font-size: 1.6rem;
+    }
+
+    h4 {
+        font-size: 1.35rem;
+    }
+
+    .movie-info h4 {
+        font-size: 1.2rem;
+    }
+
+    .movie-info h4 a {
+        font-size: inherit;
+    }
+
+    .view-all {
+        font-size: 1.15rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .movie-year,
+    .movie-rating {
+        font-size: 1rem;
+    }
+
+    /* -----------------------------------------------------------------------
+       Touch/click targets: min 60px (TV accessibility)
+    ----------------------------------------------------------------------- */
+    a,
+    button,
+    .main-nav li a,
+    .dropdown-toggle,
+    .dropdown-menu li a,
+    .logo-link,
+    .search-form input,
+    .search-form button {
+        min-height: var(--tv-min-tap);
+        min-width: var(--tv-min-tap);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    .search-form {
+        min-height: var(--tv-min-tap);
+    }
+
+    .search-form input {
+        padding: 0.75rem 1.25rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-watch,
+    .carousel-actions .btn-primary,
+    .carousel-actions .btn-secondary {
+        min-height: var(--tv-min-tap);
+        padding: 0.75rem 1.75rem;
+        font-size: 1.15rem;
+    }
+
+    .carousel-arrow {
+        width: 72px;
+        height: 72px;
+        font-size: 1.75rem;
+        min-width: 72px;
+        min-height: 72px;
+        opacity: 1;
+    }
+
+    .carousel-indicator {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+    }
+
+    .carousel-indicators {
+        padding: 12px 20px;
+        gap: 16px;
+    }
+
+    /* Movie cards: whole card is a large target; inner links get focus */
+    .movie-card {
+        min-height: 0;
+    }
+
+    .movie-card a {
+        min-height: var(--tv-min-tap);
+        padding: 0.5rem 0.75rem;
+    }
+
+    .movie-poster {
+        min-height: 280px;
+    }
+
+    .movie-grid {
+        gap: 1.75rem;
+    }
+
+    /* -----------------------------------------------------------------------
+       Carousel: always show arrows on TV (no hover-only)
+    ----------------------------------------------------------------------- */
+    .movie-carousel .carousel-arrow {
+        opacity: 0.85;
+    }
+
+    .movie-carousel .carousel-arrow:focus-visible {
+        opacity: 1;
+        outline: var(--tv-focus-ring) solid var(--tv-focus-color);
+        outline-offset: 4px;
+    }
+
+    /* -----------------------------------------------------------------------
+       Dropdown: open on focus for TV (optional; JS also handles Enter)
+       Ensure menu has focusable items with large targets
+    ----------------------------------------------------------------------- */
+    .dropdown-menu {
+        min-width: 220px;
+    }
+
+    /* -----------------------------------------------------------------------
+       Reduced motion / performance: lighter animations on TV
+    ----------------------------------------------------------------------- */
+    @media (prefers-reduced-motion: reduce), (min-width: 1920px) {
+        .carousel-slide,
+        .carousel-backdrop,
+        .carousel-content,
+        .carousel-title,
+        .carousel-overview,
+        .carousel-actions {
+            transition-duration: 0.2s;
+        }
+
+        .carousel-slide {
+            transition: opacity 0.2s ease;
+        }
+
+        .movie-card {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+    }
+
+    /* -----------------------------------------------------------------------
+       High contrast: ensure text and controls are readable
+    ----------------------------------------------------------------------- */
+    .carousel-title {
+        text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.9);
+    }
+
+    .carousel-overview,
+    .carousel-year,
+    .carousel-rating {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .section-header {
+        border-bottom-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .page-link {
+        min-height: var(--tv-min-tap);
+        padding: 0.6rem 1.25rem;
+        font-size: 1.1rem;
+    }
+
+    /* Toast / modals: larger and focusable */
+    .app-toast .toast-link,
+    .toast-close,
+    .banner-close-btn {
+        min-height: var(--tv-min-tap);
+        min-width: var(--tv-min-tap);
+        font-size: 1.1rem;
+    }
+
+}
+
+/* 1080p: strict layout for design consistency */
+@media (min-width: 1920px) and (min-height: 1080px) {
+    .container {
+        width: 80%;
+        max-width: 1760px;
+    }
+
+    body {
+        padding: max(5%, 56px);
+    }
+}
+
+/* 2K / QHD (2560×1440): wider content, safe area */
+@media (min-width: 2560px) and (min-height: 1440px) {
+    .container {
+        width: 80%;
+        max-width: 2200px;
+    }
+
+    body {
+        padding: max(6%, 64px);
+    }
+
+    :root {
+        --tv-focus-ring: 5px;
+    }
+}
+
+/* 4K UHD (3840×2160): centered content, no ultra-wide stretch */
+@media (min-width: 3840px) and (min-height: 2160px) {
+    .container {
+        width: 80%;
+        max-width: 2800px;
+    }
+
+    body {
+        padding: max(6%, 80px);
+    }
+
+    :root {
+        --tv-safe: max(6%, 80px);
+        --tv-focus-ring: 6px;
+    }
+
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 2rem;
+    }
+
+    .movie-slider .movie-card {
+        width: 220px;
+    }
+}

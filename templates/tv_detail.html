@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="movie-detail">
+    {% if show.backdrop_url %}
+    <div class="movie-backdrop" style="background-image: url('{{ show.backdrop_url }}');">
+        <div class="backdrop-overlay"></div>
+    </div>
+    {% endif %}
+    
+    <div class="movie-detail-content">
+        <div class="movie-poster-container">
+            {% if show.poster_url %}
+            <img src="{{ show.poster_url }}" alt="{{ show.name }} Poster" class="movie-poster">
+            {% else %}
+            <div class="no-poster">No Poster Available</div>
+            {% endif %}
+            
+            <div class="movie-actions">
+                <a href="{{ url_for('watch_tv', tv_id=show.id) }}" class="btn-primary btn-watch">
+                    <i class="fas fa-play"></i> Watch Now
+                </a>
+            </div>
+        </div>
+        
+        <div class="movie-info-container">
+            <h1 class="movie-title">{{ show.name }}</h1>
+            
+            {% if show.tagline %}
+            <p class="movie-tagline">"{{ show.tagline }}"</p>
+            {% endif %}
+            
+            <div class="movie-meta">
+                <span class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</span>
+                <span class="movie-runtime">{{ show.number_of_seasons }} Season{% if show.number_of_seasons != 1 %}s{% endif %}</span>
+                <span class="movie-runtime">{{ show.number_of_episodes }} Episode{% if show.number_of_episodes != 1 %}s{% endif %}</span>
+                <span class="movie-rating">
+                    <i class="fas fa-star"></i> {{ show.vote_average|round(1) }}
+                </span>
+            </div>
+            
+            <div class="movie-genres">
+                {% for genre in show.genres %}
+                <a href="{{ url_for('tv_genre', genre_id=genre.id) }}" class="genre-tag" tabindex="-1">{{ genre.name }}</a>
+                {% endfor %}
+            </div>
+            
+            <div class="movie-overview">
+                <h3>Overview</h3>
+                <p>{{ show.overview }}</p>
+            </div>
+            
+            {% if show.credits and show.credits.cast %}
+            <div class="movie-cast">
+                <h3>Cast</h3>
+                <div class="cast-list">
+                    {% for actor in show.credits.cast[:8] %}
+                    <div class="cast-member">
+                        <a href="{{ url_for('actor_detail', actor_id=actor.id) }}" class="actor-link">
+                            {% if actor.profile_url %}
+                            <img src="{{ actor.profile_url }}" alt="{{ actor.name }}" class="cast-photo">
+                            {% else %}
+                            <div class="no-photo">No Photo</div>
+                            {% endif %}
+                            <div class="cast-info">
+                                <p class="cast-name">{{ actor.name }}</p>
+                                <p class="cast-character">{{ actor.character }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="movie-details">
+                <h3>Details</h3>
+                <table class="details-table">
+                    <tr>
+                        <th>Status:</th>
+                        <td>{{ show.status }}</td>
+                    </tr>
+                    <tr>
+                        <th>First Air Date:</th>
+                        <td>{{ show.first_air_date }}</td>
+                    </tr>
+                    {% if show.last_air_date %}
+                    <tr>
+                        <th>Last Air Date:</th>
+                        <td>{{ show.last_air_date }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if show.created_by %}
+                    <tr>
+                        <th>Created By:</th>
+                        <td>{{ show.created_by|map(attribute='name')|join(', ') }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if show.networks %}
+                    <tr>
+                        <th>Networks:</th>
+                        <td>{{ show.networks|map(attribute='name')|join(', ') }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if show.production_companies %}
+                    <tr>
+                        <th>Production:</th>
+                        <td>{{ show.production_companies|map(attribute='name')|join(', ') }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .actor-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.2s ease;
+    }
+    
+    .actor-link:hover {
+        transform: translateY(-5px);
+    }
+    
+    .actor-link:hover .cast-name {
+        color: #fff;
+    }
+</style>
+
+<div class="iframe-container" style="margin-top: -100px;">
+    <div class="banner-wrapper" style="position: relative; width: 300px; margin-top: 150px;">
+        <iframe id="banner-iframe" src="//cpm.revrtb.com/tag?zone_id=269193&size=300x250&ad_type=iframe" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe>
+        <!-- <iframe id="banner-iframe" src="/adban" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe> -->
+    </div>
+    <div class="banner-wrapper" style="position: relative; width: 300px; margin-top: 150px;">
+        <iframe id="banner-iframe" src="//cpm.revrtb.com/tag?zone_id=269193&size=300x250&ad_type=iframe" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe>
+        <!-- <iframe id="banner-iframe" src="/adban" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe> -->
+    </div>
+</div>
+
+<!-- Related TV Shows Section -->
+{% if related_shows %}
+<div class="related-section">
+    <div class="related-section">
+        <div class="section-header">
+            <h2>Related tv shows</h2>
+        </div>
+        
+        <div class="movie-slider">
+            <div class="movie-grid">
+                {% for show in related_shows %}
+                {% if show.poster_url %}
+                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+                    <div class="movie-poster">
+                        <img src="{{ show.poster_url }}" alt="{{ show.name }}" class="movie-poster-img">
+                    </div>
+                    <div class="movie-info">
+                        <h4>{{ show.name }}</h4>
+                        <div class="movie-meta">
+                            <span class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</span>
+                            <span class="movie-rating"><i class="fas fa-star"></i> {{ show.vote_average|round(1) }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

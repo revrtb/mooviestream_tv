@@ -1,0 +1,374 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="mobile-app-section">
+    <div class="mobile-app-container">
+        <h1>Download Mooviestream Mobile/Tablet App</h1>
+        <p class="mobile-app-intro">Experience Mooviestream on the go! Download our mobile and tablet app for Android and iOS to enjoy your favorite movies and TV shows anytime, anywhere.</p>
+        
+        <div class="app-platforms">
+            <!-- Android App -->
+            <div class="platform-card android-card">
+                <div class="platform-header">
+                    <i class="fab fa-android platform-icon android-icon"></i>
+                    <h2>Android</h2>
+                </div>
+                <div class="platform-content">
+                    <p class="platform-description">Download the Mooviestream app for Android devices. Compatible with Android 5.0 and above.</p>
+                    <div class="platform-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Watch movies and TV shows offline</li>
+                            <li><i class="fas fa-check"></i> Personalized recommendations</li>
+                            <li><i class="fas fa-check"></i> Fast and smooth streaming</li>
+                            <li><i class="fas fa-check"></i> Regular updates and new features</li>
+                        </ul>
+                    </div>
+                    <a href="{{ url_for('download_android') }}" class="download-btn android-btn" download="Mooviestream-{{ apk_version or 'latest' }}.apk">
+                        <i class="fas fa-download"></i> Download APK
+                    </a>
+                    <p class="download-info">Version {{ apk_version or 'N/A' }} | Size: ~5 MB</p>
+                </div>
+            </div>
+            
+            <!-- iOS App -->
+            <div class="platform-card ios-card">
+                <div class="platform-header">
+                    <i class="fab fa-apple platform-icon ios-icon"></i>
+                    <h2>iOS</h2>
+                </div>
+                <div class="platform-content">
+                    <p class="platform-description">Install Mooviestream on your iPhone or iPad using Safari or Chrome's "Add to Home Screen" feature. This creates a native-like app experience directly from your browser.</p>
+                    <div class="platform-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Optimized for iPhone and iPad</li>
+                            <li><i class="fas fa-check"></i> Works like a native app</li>
+                            <li><i class="fas fa-check"></i> High-quality streaming</li>
+                            <li><i class="fas fa-check"></i> No App Store required</li>
+                        </ul>
+                    </div>
+                    <a href="#" class="download-btn ios-btn" id="ios-install-btn-page">
+                        <i class="fas fa-mobile-alt"></i> Add to Home Screen
+                    </a>
+                    <p class="download-info">Install via Safari or Chrome</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="installation-instructions">
+            <h3>Installation Instructions</h3>
+            
+            <div class="instructions-section">
+                <h4><i class="fab fa-android"></i> For Android</h4>
+                <ol>
+                    <li>Download the APK file by clicking the "Download APK" button above</li>
+                    <li>Once downloaded, open the APK file from your device's Downloads folder</li>
+                    <li>If prompted, allow installation from "Unknown Sources" in your device settings</li>
+                    <li>Follow the on-screen instructions to complete the installation</li>
+                    <li>Launch the app and start streaming!</li>
+                </ol>
+                <p class="note"><strong>Note:</strong> Make sure you have enough storage space on your device before downloading.</p>
+            </div>
+            
+            <div class="instructions-section">
+                <h4><i class="fab fa-apple"></i> For iOS (iPhone/iPad)</h4>
+                <ol>
+                    <li>Open <strong>Safari</strong> or <strong>Chrome</strong> browser on your iPhone or iPad</li>
+                    <li>Navigate to <strong>mooviestream.com</strong></li>
+                    <li>Tap the <strong>Share</strong> button <i class="fas fa-share-square"></i> at the bottom of the screen</li>
+                    <li>Scroll down and tap <strong>"Add to Home Screen"</strong> <i class="fas fa-plus-square"></i></li>
+                    <li>Tap <strong>"Add"</strong> in the top right corner</li>
+                    <li>Mooviestream will appear on your home screen like a native app!</li>
+                </ol>
+                <p class="note"><strong>Note:</strong> The "Add to Home Screen" feature is available in Safari and Chrome browsers on iOS.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.mobile-app-section {
+    padding: 2rem 0;
+    min-height: 70vh;
+}
+
+.mobile-app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.mobile-app-section h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.mobile-app-intro {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 3rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.app-platforms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.platform-card {
+    background-color: #1a1a1a;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.platform-card:hover:not(.disabled) {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+
+.platform-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.platform-icon {
+    font-size: 3rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.android-icon {
+    background-color: #3DDC84;
+    color: #000;
+}
+
+.ios-icon {
+    background-color: #A8A8A8;
+    color: #fff;
+}
+
+.platform-header h2 {
+    font-size: 2rem;
+    color: #fff;
+    margin: 0;
+}
+
+.platform-description {
+    color: #fff;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.platform-features ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.platform-features li {
+    color: #fff;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+.platform-features li i {
+    color: #3DDC84;
+    font-size: 0.9rem;
+}
+
+.platform-card.disabled .platform-features li i {
+    color: #A8A8A8;
+}
+
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.android-btn {
+    background: linear-gradient(135deg, #3DDC84, #2AB865);
+    color: #000;
+}
+
+.android-btn:hover {
+    background: linear-gradient(135deg, #4EED94, #3BC875);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(61, 220, 132, 0.4);
+    text-decoration: none;
+    color: #000;
+}
+
+.ios-btn {
+    background: linear-gradient(135deg, #A8A8A8, #888888);
+    color: #fff;
+    cursor: pointer;
+}
+
+.ios-btn:hover {
+    background: linear-gradient(135deg, #B8B8B8, #989898);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(168, 168, 168, 0.4);
+    text-decoration: none;
+    color: #fff;
+}
+
+.download-info {
+    text-align: center;
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.installation-instructions {
+    background-color: #1a1a1a;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: 3rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.installation-instructions h3 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.instructions-section {
+    margin-bottom: 2.5rem;
+}
+
+.instructions-section:last-child {
+    margin-bottom: 0;
+}
+
+.instructions-section h4 {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.instructions-section h4 i {
+    font-size: 1.5rem;
+}
+
+.instructions-section ol {
+    color: #fff;
+    line-height: 2;
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.instructions-section li {
+    margin-bottom: 0.8rem;
+}
+
+.instructions-section li i {
+    margin: 0 5px;
+    color: #1962BE;
+}
+
+.note {
+    color: #fff;
+    background-color: rgba(11, 114, 166, 0.2);
+    padding: 1rem;
+    border-radius: 10px;
+    border-left: 4px solid #0b72a6;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .app-platforms {
+        grid-template-columns: 1fr;
+    }
+    
+    .mobile-app-section h1 {
+        font-size: 2rem;
+    }
+    
+    .platform-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .platform-icon {
+        font-size: 2rem;
+        width: 50px;
+        height: 50px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const iosInstallBtn = document.getElementById('ios-install-btn-page');
+    if (iosInstallBtn) {
+        iosInstallBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Check if device is iOS
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            
+            if (isIOS) {
+                // Check if already in standalone mode (PWA installed)
+                const isStandalone = window.navigator.standalone === true || 
+                                    window.matchMedia('(display-mode: standalone)').matches;
+                
+                if (isStandalone) {
+                    alert('Mooviestream is already installed on your home screen!');
+                    return;
+                }
+                
+                // Show iOS install popup (if function exists from layout.html)
+                if (typeof showIOSInstallPopup === 'function') {
+                    showIOSInstallPopup();
+                } else {
+                    // Fallback: show instructions
+                    alert('To install Mooviestream:\n\n1. Tap the Share button at the bottom\n2. Select "Add to Home Screen"\n3. Tap "Add"\n\nThis works in Safari or Chrome on iOS!');
+                }
+            } else {
+                alert('This installation method is for iOS devices only. Please use a mobile browser on your iPhone or iPad.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+

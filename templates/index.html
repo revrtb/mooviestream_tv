@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- <div class="iframe-container">
+    <div class="banner-wrapper" style="position: relative; width: 300px; margin-right: 16px;">
+        <iframe id="banner-iframe" src="//cpm.revrtb.com/tag?zone_id=269193&size=300x250&ad_type=iframe" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe>
+    </div>
+    <div class="banner-wrapper" style="position: relative; width: 300px;">
+        <iframe id="banner-iframe" src="//cpm.revrtb.com/tag?zone_id=269193&size=300x250&ad_type=iframe" width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="true"></iframe>
+    </div>
+</div> -->
+
+<section id="trending" class="movie-section">
+    <div class="section-header">
+        <h2>Trending Movies This Week</h2>
+        <a href="{{ url_for('trending_movies') }}" class="view-all">View All</a>
+    </div>
+    
+    <div class="movie-slider">
+        <div class="movie-grid">
+            {% for movie in trending_movies.results[:12] %}
+            {% if movie.poster_url %}
+            <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('movie_detail', movie_id=movie.id) }}">
+                <div class="movie-poster">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster">
+                </div>
+                <div class="movie-info">
+                    <h4>{{ movie.title }}</h4>
+                    <p class="movie-year">{{ movie.release_date[:4] if movie.release_date else 'N/A' }}</p>
+                    <p class="movie-rating">
+                        <i class="fas fa-star"></i> {{ movie.vote_average|round(1) }}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="trending-tv" class="movie-section">
+    <div class="section-header">
+        <h2>Trending TV Shows This Week</h2>
+        <a href="{{ url_for('trending_tv_shows') }}" class="view-all">View All</a>
+    </div>
+    
+    <div class="movie-slider">
+        <div class="movie-grid">
+        {% for show in trending_tv_shows.results %}
+        {% if show.poster_url %}
+        <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+            <div class="movie-poster">
+                <img src="{{ show.poster_url }}" alt="{{ show.name }} Poster">
+            </div>
+            <div class="movie-info">
+                <h4>{{ show.name }}</h4>
+                <p class="movie-year">{{ show.first_air_date[:4] if show.first_air_date else 'N/A' }}</p>
+                <p class="movie-rating">
+                    <i class="fas fa-star"></i> {{ show.vote_average|round(1) }}
+                </p>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

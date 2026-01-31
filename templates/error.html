@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="error-section">
+    <div class="error-container">
+        <h2>{{ title }}</h2>
+        
+        <div class="error-message">
+            <p>{{ error_message }}</p>
+        </div>
+        
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

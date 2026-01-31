@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /search?*
+Disallow: /error
+Disallow: /404
+Disallow: /500
+
+# Allow all bots to access static files
+Allow: /static/
+
+# Sitemap locations
+Sitemap: https://Mooviestream.com/sitemap.xml
