@@ -59,7 +59,7 @@ function initializeInfiniteScroll() {
     const existingCards = movieGrid.querySelectorAll('.movie-card');
     
     function getIdFromCard(card) {
-        const href = card.getAttribute('data-detail-href') || (card.querySelector('a[href]') && card.querySelector('a[href]').getAttribute('href'));
+        const href = card.getAttribute('data-detail-href') || card.getAttribute('href') || (card.querySelector('a[href]') && card.querySelector('a[href]').getAttribute('href'));
         if (!href) return null;
         const matches = href.match(/\/(movie|tv|actor)\/(\d+)/);
         return matches && matches[2] ? matches[2] : null;
@@ -208,17 +208,16 @@ function initializeInfiniteScroll() {
                             loadedItemIds.add(item.id.toString());
                             uniqueItemsCount++;
                             
-                            const movieCard = document.createElement('div');
+                            const movieCard = document.createElement('a');
                             movieCard.className = 'movie-card';
                             movieCard.setAttribute('tabindex', '0');
-                            movieCard.setAttribute('role', 'button');
                             
                             // Determine the item's media type
                             const itemMediaType = item.media_type || mediaType;
                             
-                            // Create HTML content based on media type (inner links tabindex="-1" for single-card focus)
+                            // Create HTML content based on media type
                             if (itemMediaType === 'person') {
-                                movieCard.setAttribute('data-detail-href', `/actor/${item.id}`);
+                                movieCard.setAttribute('href', `/actor/${item.id}`);
                                 movieCard.innerHTML = `
                                     <div class="movie-poster">
                                         ${item.profile_url ? 
@@ -233,7 +232,7 @@ function initializeInfiniteScroll() {
                                     </div>
                                 `;
                             } else if (itemMediaType === 'tv') {
-                                movieCard.setAttribute('data-detail-href', `/tv/${item.id}`);
+                                movieCard.setAttribute('href', `/tv/${item.id}`);
                                 movieCard.innerHTML = `
                                     <div class="movie-poster">
                                         ${item.poster_url ? 
@@ -249,7 +248,7 @@ function initializeInfiniteScroll() {
                                     </div>
                                 `;
                             } else {
-                                movieCard.setAttribute('data-detail-href', `/movie/${item.id}`);
+                                movieCard.setAttribute('href', `/movie/${item.id}`);
                                 movieCard.innerHTML = `
                                     <div class="movie-poster">
                                         ${item.poster_url ? 

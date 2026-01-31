@@ -140,7 +140,7 @@
             <div class="movie-grid">
                 {% for movie in related_movies %}
                 {% if movie.poster_url %}
-                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('movie_detail', movie_id=movie.id) }}">
+                <a class="movie-card" href="{{ url_for('movie_detail', movie_id=movie.id) }}" tabindex="0">
                     <div class="movie-poster">
                         <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-img">
                     </div>
@@ -151,7 +151,7 @@
                             <span class="movie-rating"><i class="fas fa-star"></i> {{ movie.vote_average|round(1) }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
                 {% endif %}
                 {% endfor %}
             </div>

@@ -49,7 +49,7 @@
             <div class="movie-grid">
                 {% for movie in actor.movie_credits.cast %}
                 {% if movie.poster_url %}
-                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('movie_detail', movie_id=movie.id) }}">
+                <a class="movie-card" href="{{ url_for('movie_detail', movie_id=movie.id) }}" tabindex="0">
                     <div class="movie-poster">
                         <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-img">
                     </div>
@@ -63,7 +63,7 @@
                             {% endif %}
                         </div>
                     </div>
-                </div>
+                </a>
                 {% endif %}
                 {% endfor %}
             </div>
@@ -82,7 +82,7 @@
             <div class="movie-grid">
                 {% for show in actor.tv_credits.cast %}
                 {% if show.character and show.poster_url and not (show.character == actor.name or "Self" in show.character or "Himself" in show.character or "Herself" in show.character) %}
-                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+                <a class="movie-card" href="{{ url_for('tv_detail', tv_id=show.id) }}" tabindex="0">
                     <div class="movie-poster">
                         <img src="{{ show.poster_url }}" alt="{{ show.name }}" class="movie-poster-img">
                     </div>
@@ -96,7 +96,7 @@
                             {% endif %}
                         </div>
                     </div>
-                </div>
+                </a>
                 {% endif %}
                 {% endfor %}
             </div>

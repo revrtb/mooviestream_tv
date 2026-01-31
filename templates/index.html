@@ -20,7 +20,7 @@
         <div class="movie-grid">
             {% for movie in trending_movies.results[:12] %}
             {% if movie.poster_url %}
-            <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('movie_detail', movie_id=movie.id) }}">
+            <a class="movie-card" href="{{ url_for('movie_detail', movie_id=movie.id) }}" tabindex="0">
                 <div class="movie-poster">
                     <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster">
                 </div>
@@ -31,7 +31,7 @@
                         <i class="fas fa-star"></i> {{ movie.vote_average|round(1) }}
                     </p>
                 </div>
-            </div>
+            </a>
             {% endif %}
             {% endfor %}
         </div>
@@ -48,7 +48,7 @@
         <div class="movie-grid">
         {% for show in trending_tv_shows.results %}
         {% if show.poster_url %}
-        <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+        <a class="movie-card" href="{{ url_for('tv_detail', tv_id=show.id) }}" tabindex="0">
             <div class="movie-poster">
                 <img src="{{ show.poster_url }}" alt="{{ show.name }} Poster">
             </div>
@@ -59,7 +59,7 @@
                     <i class="fas fa-star"></i> {{ show.vote_average|round(1) }}
                 </p>
             </div>
-        </div>
+        </a>
         {% endif %}
         {% endfor %}
         </div>

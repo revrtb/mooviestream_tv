@@ -146,7 +146,11 @@
 
         if (key === 'Enter' || key === ' ') {
             if (current && current.classList.contains('movie-card')) {
-                var href = current.getAttribute('data-detail-href');
+                /* Let browser handle if it's a real link (standard mouse/Enter behavior) */
+                if (current.tagName === 'A' && current.getAttribute('href') && current.getAttribute('href').indexOf('#') !== 0) {
+                    return;
+                }
+                var href = current.getAttribute('data-detail-href') || current.getAttribute('href');
                 if (href) {
                     window.location.href = href;
                     e.preventDefault();
@@ -186,29 +190,39 @@
     }
 
     var lastCardNav = 0;
+    function getCardHref(card) {
+        var h = card && (card.getAttribute('href') || card.getAttribute('data-detail-href'));
+        return h && h.indexOf('#') !== 0 ? h : null;
+    }
     function getCardFromEvent(e) {
         var target = e.target && e.target.closest ? e.target.closest('.movie-card') : null;
-        if (target && target.getAttribute && target.getAttribute('data-detail-href')) return target;
+        if (target && getCardHref(target)) return target;
         /* WebOS: target can be wrong for pointer events; try element under coordinates */
         if (e.clientX != null && e.clientY != null) {
             var el = document.elementFromPoint(e.clientX, e.clientY);
             if (el) {
                 var card = el.closest ? el.closest('.movie-card') : null;
-                if (card && card.getAttribute && card.getAttribute('data-detail-href')) return card;
+                if (card && getCardHref(card)) return card;
             }
         }
         return null;
     }
     function handleCardActivation(e) {
-        if (e.target && e.target.closest && e.target.closest('a') && e.target.closest('a').getAttribute('href') !== '#') return;
+        /* Skip if click is on a non-card link (e.g. view-all, genre) */
+        var link = e.target && e.target.closest ? e.target.closest('a') : null;
+        if (link && link.getAttribute('href') && link.getAttribute('href').indexOf('#') !== 0 && !link.classList.contains('movie-card')) return;
         var card = getCardFromEvent(e);
         if (!card) return;
+        var href = getCardHref(card);
+        if (!href) return;
+        /* Standard mouse click / pointerup: let browser handle for <a> cards */
+        if ((e.type === 'click' || e.type === 'pointerup') && card.tagName === 'A') return;
         var now = Date.now();
         if (now - lastCardNav < 500) return;
         lastCardNav = now;
         e.preventDefault();
         if (e.stopPropagation) e.stopPropagation();
-        window.location.href = card.getAttribute('data-detail-href');
+        window.location.href = href;
     }
 
     function init() {

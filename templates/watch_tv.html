@@ -126,7 +126,7 @@
         <div class="movie-slider">
             <div class="movie-grid">
                 {% for show in related_shows %}
-                <div class="movie-card" tabindex="0" role="button" data-detail-href="{{ url_for('tv_detail', tv_id=show.id) }}">
+                <a class="movie-card" href="{{ url_for('tv_detail', tv_id=show.id) }}" tabindex="0">
                     <div class="movie-poster">
                         {% if show.poster_url %}
                         <img src="{{ show.poster_url }}" alt="{{ show.name }}" class="movie-poster-img">
@@ -141,7 +141,7 @@
                             <span class="movie-rating"><i class="fas fa-star"></i> {{ show.vote_average|round(1) }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
                 {% endfor %}
             </div>
         </div>

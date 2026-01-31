@@ -1002,6 +1002,13 @@ h2, h3, h4 {
     transition: transform 0.3s ease;
 }
 
+/* Link cards: standard mouse click, middle-click new tab, right-click menu */
+a.movie-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
 .movie-card[tabindex="0"] {
     cursor: pointer;
 }
