@@ -206,6 +206,12 @@
     /* Movie cards: whole card is a large target; inner links get focus */
     .movie-card {
         min-height: 0;
+        /* WebOS: ensure pointer/click events reach the card */
+        pointer-events: auto;
+    }
+
+    .movie-card * {
+        pointer-events: auto;
     }
 
     .movie-card a {

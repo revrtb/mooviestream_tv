@@ -186,10 +186,23 @@
     }
 
     var lastCardNav = 0;
+    function getCardFromEvent(e) {
+        var target = e.target && e.target.closest ? e.target.closest('.movie-card') : null;
+        if (target && target.getAttribute && target.getAttribute('data-detail-href')) return target;
+        /* WebOS: target can be wrong for pointer events; try element under coordinates */
+        if (e.clientX != null && e.clientY != null) {
+            var el = document.elementFromPoint(e.clientX, e.clientY);
+            if (el) {
+                var card = el.closest ? el.closest('.movie-card') : null;
+                if (card && card.getAttribute && card.getAttribute('data-detail-href')) return card;
+            }
+        }
+        return null;
+    }
     function handleCardActivation(e) {
-        var card = e.target && e.target.closest && e.target.closest('.movie-card');
-        if (!card || !card.getAttribute('data-detail-href') || (e.target.closest && e.target.closest('a'))) return;
-        /* Avoid double navigation when both pointerup and click fire (e.g. WebOS) */
+        if (e.target && e.target.closest && e.target.closest('a') && e.target.closest('a').getAttribute('href') !== '#') return;
+        var card = getCardFromEvent(e);
+        if (!card) return;
         var now = Date.now();
         if (now - lastCardNav < 500) return;
         lastCardNav = now;
@@ -201,8 +214,9 @@
     function init() {
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('click', handleCardActivation, true);
-        /* WebOS magic remote pointer: click may not fire, so handle pointerup */
         document.addEventListener('pointerup', handleCardActivation, true);
+        /* WebOS: pointer click often only fires pointerdown, not pointerup/click */
+        document.addEventListener('pointerdown', handleCardActivation, true);
         if (document.body && isTVContext()) {
             document.body.classList.add('tv-nav-enabled');
         }
