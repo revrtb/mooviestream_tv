@@ -185,17 +185,24 @@
         }
     }
 
-    function handleCardClick(e) {
+    var lastCardNav = 0;
+    function handleCardActivation(e) {
         var card = e.target && e.target.closest && e.target.closest('.movie-card');
-        if (card && card.getAttribute('data-detail-href') && !(e.target.closest && e.target.closest('a'))) {
-            e.preventDefault();
-            window.location.href = card.getAttribute('data-detail-href');
-        }
+        if (!card || !card.getAttribute('data-detail-href') || (e.target.closest && e.target.closest('a'))) return;
+        /* Avoid double navigation when both pointerup and click fire (e.g. WebOS) */
+        var now = Date.now();
+        if (now - lastCardNav < 500) return;
+        lastCardNav = now;
+        e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+        window.location.href = card.getAttribute('data-detail-href');
     }
 
     function init() {
         document.addEventListener('keydown', handleKeydown, true);
-        document.addEventListener('click', handleCardClick, true);
+        document.addEventListener('click', handleCardActivation, true);
+        /* WebOS magic remote pointer: click may not fire, so handle pointerup */
+        document.addEventListener('pointerup', handleCardActivation, true);
         if (document.body && isTVContext()) {
             document.body.classList.add('tv-nav-enabled');
         }
